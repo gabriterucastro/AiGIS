@@ -93,14 +93,18 @@ public class MainFrame extends MainFrameDesign {
     }
 
 	public void rebuildUI() {
-    SwingUtilities.invokeLater(() -> {
-        dispose();
-        MainFrame frame = new MainFrame();
-		frame.setSize(1400, 1000);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-    });
-}
+        Dimension size = this.getSize();
+        Point location = this.getLocation();
+        SwingUtilities.invokeLater(() -> {
+            dispose();
+            MainFrame frame = new MainFrame();
+            frame.setSize(size);
+            frame.setLocation(location);
+            frame.setVisible(true);
+            frame.revalidate();
+            frame.repaint();
+        });
+    }
 
 	public MainFrame() {
 
