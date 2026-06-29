@@ -42,7 +42,7 @@ func_jar()
   CLASSPATH="./libs/jogl-all.jar${CPSEP}./libs/gluegen-rt.jar${CPSEP}./libs/vecmath.jar${CPSEP}./libs/jfreechart-1.0.19.jar${CPSEP}./libs/jcommon-1.0.23.jar${CPSEP}./libs/AppleJavaExtensions-1.6.jar${CPSEP}./libs/fits.jar"
 
   echo "Compiling Java sources..."
-  find ./src -name "*.java" -print | xargs javac -XDignore.symbol.file -classpath "$CLASSPATH" -d $TMPDIR $JAVACOPT
+  find ./src -name "*.java" -print | xargs javac -encoding UTF-8 -XDignore.symbol.file -classpath "$CLASSPATH" -d $TMPDIR $JAVACOPT
 
   cp -R src/aigis/res $TMPDIR/aigis/res
   mkdir -p $TMPDIR/aigis/i18n

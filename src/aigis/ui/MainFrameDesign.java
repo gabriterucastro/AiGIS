@@ -267,6 +267,7 @@ public class MainFrameDesign extends JFrame {
 
 				langItem.addActionListener(e -> {
                     I18n.setLocale(locale);
+                    aigis.App.setProp("locale", locale.getLanguage());
                     rebuildUI();
 				});
             langGroup.add(langItem);

@@ -87,6 +87,37 @@ public class MainFrame extends MainFrameDesign {
 	private TreeMap<String, ChartFrame> chartFrames = new TreeMap<>();
 	private final DecimalFormat doubleFormat = new DecimalFormat("#.########");
 	private JEditorPane spectrumDescriptionArea;
+	/** Data folder of the currently loaded model; descriptions are read from here first. */
+	private File currentDataDir;
+
+	private static final String LOCALE_KEY = "locale";
+
+	/*
+	 * Resolve the UI language before any instance (and therefore before the
+	 * MainFrameDesign super-constructor) builds localized text. On first launch
+	 * a Japanese/English chooser is shown and the choice is persisted; later
+	 * launches reuse the saved locale.
+	 */
+	static {
+		initLocale();
+	}
+
+	private static void initLocale() {
+		String saved = App.getProp(LOCALE_KEY);
+		if (saved != null && !saved.isEmpty()) {
+			I18n.setLocale("en".equalsIgnoreCase(saved) ? Locale.ENGLISH : Locale.JAPANESE);
+			return;
+		}
+		// First-launch chooser: Japanese / English
+		Object[] options = { "English", "日本語" };
+		int choice = JOptionPane.showOptionDialog(null,
+				"言語を選択してください\nSelect language",
+				"Language / 言語",
+				JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+		Locale chosen = (choice == 0) ? Locale.ENGLISH : Locale.JAPANESE;
+		I18n.setLocale(chosen);
+		App.setProp(LOCALE_KEY, chosen.getLanguage());
+	}
 
     private void refreshTexts() {
         SwingUtilities.updateComponentTreeUI(this);
@@ -638,19 +669,8 @@ public class MainFrame extends MainFrameDesign {
                 glPanel.repaint();
 
 				if (spectrumInfoPanel.isVisible()) {
-                    try {
-						String lang = I18n.getLocale().getLanguage();
-						URL url = App.class.getResource("/aigis/res/spectrum/" + lang + "/" + key + ".html");
-						if (url != null) {
-							spectrumDescriptionArea.setPage(url);
-						} else {
-							spectrumDescriptionArea.setText("<html><body>" + I18n.t("j.noexplanation") + "</body></html>");
-						}
-					} catch (Exception ex) {
-						Logger.Error(ex);
-						spectrumDescriptionArea.setText("<html><body>" + I18n.t("j.noexplanation") + "</body></html>");
-                    }
-                }                 
+                    loadDescription(key);
+                }
             }
 		});
 
@@ -991,8 +1011,63 @@ public class MainFrame extends MainFrameDesign {
 	 * 
 	 * @param file
 	 */
+	/**
+	 * Load the HTML explanation for the given spectrum/map key into the
+	 * description panel. The current data folder is searched first
+	 * ({@code Description/{lang}/{key}.html}), then the bundled JAR resource,
+	 * and finally a "no explanation" placeholder.
+	 */
+	private void loadDescription(String key) {
+		String lang = I18n.getLocale().getLanguage();
+		String html = null;
+		if (currentDataDir != null) {
+			File f = new File(currentDataDir,
+					"Description" + File.separator + lang + File.separator + key + ".html");
+			if (f.exists()) {
+				html = readFileAsString(f);
+			}
+		}
+		if (html == null) {
+			URL url = App.class.getResource("/aigis/res/spectrum/" + lang + "/" + key + ".html");
+			if (url != null) {
+				html = readUrlAsString(url);
+			}
+		}
+		if (html == null) {
+			html = "<html><body>" + I18n.t("j.noexplanation") + "</body></html>";
+		}
+		spectrumDescriptionArea.setContentType("text/html");
+		spectrumDescriptionArea.setText(html);
+		spectrumDescriptionArea.setCaretPosition(0);
+	}
+
+	private String readFileAsString(File f) {
+		try {
+			return new String(java.nio.file.Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8);
+		} catch (Exception e) {
+			Logger.Error(e);
+			return null;
+		}
+	}
+
+	private String readUrlAsString(URL url) {
+		try (InputStream in = url.openStream();
+				java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream()) {
+			byte[] buf = new byte[8192];
+			int n;
+			while ((n = in.read(buf)) != -1) {
+				bos.write(buf, 0, n);
+			}
+			return new String(bos.toByteArray(), StandardCharsets.UTF_8);
+		} catch (Exception e) {
+			Logger.Error(e);
+			return null;
+		}
+	}
+
 	private void loadFile(File file) {
 		Logger.Debug(file.getAbsolutePath());
+		this.currentDataDir = file;
 		LoadingDialog dialog = new LoadingDialog(this);
 		setEnabled(false);
 
@@ -1046,6 +1121,9 @@ public class MainFrame extends MainFrameDesign {
 								}
 								setTitle("AiGIS" + title);
 								buildModelList();
+								if (getSpectrumInfoPanel().isVisible()) {
+									loadDescription(Const.SPECTRUMKEY_FLAT);
+								}
 								dialog.setVisible(false);
 							}
 						});
