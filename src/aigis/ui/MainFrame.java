@@ -52,6 +52,7 @@ import aigis.App;
 import aigis.Const;
 import aigis.Logger;
 import aigis.Scene;
+import aigis.SceneManager;
 import aigis.gl.Renderer;
 import aigis.gl.Textures.Setting;
 import aigis.model.CameraInfo;
@@ -78,7 +79,8 @@ import javax.swing.JEditorPane;
 @SuppressWarnings("serial")
 public class MainFrame extends MainFrameDesign {
 
-	private Scene scene = new Scene();
+	private SceneManager sceneManager = new SceneManager();
+	private Scene scene = sceneManager.getActiveScene();
 	private GLSplitWindow window;
 	private MapTableModel mapModel;
 	private TexTableModel texModel;
@@ -87,17 +89,12 @@ public class MainFrame extends MainFrameDesign {
 	private TreeMap<String, ChartFrame> chartFrames = new TreeMap<>();
 	private final DecimalFormat doubleFormat = new DecimalFormat("#.########");
 	private JEditorPane spectrumDescriptionArea;
+	private String parentFileName;
 	/** Data folder of the currently loaded model; descriptions are read from here first. */
 	private File currentDataDir;
 
 	private static final String LOCALE_KEY = "locale";
 
-	/*
-	 * Resolve the UI language before any instance (and therefore before the
-	 * MainFrameDesign super-constructor) builds localized text. On first launch
-	 * a Japanese/English chooser is shown and the choice is persisted; later
-	 * launches reuse the saved locale.
-	 */
 	static {
 		initLocale();
 	}
@@ -108,7 +105,6 @@ public class MainFrame extends MainFrameDesign {
 			I18n.setLocale("en".equalsIgnoreCase(saved) ? Locale.ENGLISH : Locale.JAPANESE);
 			return;
 		}
-		// First-launch chooser: Japanese / English
 		Object[] options = { "English", "日本語" };
 		int choice = JOptionPane.showOptionDialog(null,
 				"言語を選択してください\nSelect language",
@@ -123,19 +119,23 @@ public class MainFrame extends MainFrameDesign {
         SwingUtilities.updateComponentTreeUI(this);
     }
 
-	public void rebuildUI() {
-        Dimension size = this.getSize();
-        Point location = this.getLocation();
-        SwingUtilities.invokeLater(() -> {
-            dispose();
-            MainFrame frame = new MainFrame();
-            frame.setSize(size);
-            frame.setLocation(location);
-            frame.setVisible(true);
-            frame.revalidate();
-            frame.repaint();
-        });
+	private String getParentFileName() {
+        return parentFileName;
     }
+
+	public void rebuildUI() {
+		Dimension size = this.getSize();
+		Point location = this.getLocation();
+		SwingUtilities.invokeLater(() -> {
+			dispose();
+			MainFrame frame = new MainFrame();
+			frame.setSize(size);
+			frame.setLocation(location);
+			frame.setVisible(true);
+			frame.revalidate();
+			frame.repaint();
+		});
+	}
 
 	public MainFrame() {
 
@@ -165,6 +165,7 @@ public class MainFrame extends MainFrameDesign {
 
 		// Menu Components
 		JMenuItem fileOpen = this.getMntmOpen();
+		JMenuItem fileOpenNewScene = this.getMntmOpenNewScene();
 		JMenuItem fileSaveSS = this.getMntmSaveSS();
 		JMenuItem fileAbout = this.getMntmAbout();
 		JMenuItem fileSettings = this.getMntmSettings();
@@ -212,7 +213,7 @@ public class MainFrame extends MainFrameDesign {
 
 		// gl
 		GLJPanel glPanel = this.getPanelGL();
-		window = new GLSplitWindow(glPanel, scene);
+		window = new GLSplitWindow(glPanel, sceneManager);
 
 		///// setting events ///
 
@@ -242,6 +243,15 @@ public class MainFrame extends MainFrameDesign {
 			@Override
 			public void screenChanged(int index) {
 				Renderer rendere = window.getActiveRenderer();
+				// switch UI to the scene displayed in the active view
+				if (rendere.getScene() != scene) {
+					scene = rendere.getScene();
+					sceneManager.setActiveScene(scene);
+					clearModelList();
+					buildModelList();
+					String title = scene.getTitle();
+					setTitle("AiGIS" + (title == null ? "" : " -" + title + "-"));
+				}
 				int polygonID = rendere.getPolygonID();
 				LatLon info = rendere.selectPolygon(polygonID, false);
 				String rowKey = rendere.getCurrentSpectrumKey();
@@ -376,7 +386,10 @@ public class MainFrame extends MainFrameDesign {
 		ActionListener fileAction = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (e.getSource() == fileOpen) {
-					openFile(false);
+					openFile(false, false);
+				}
+				if (e.getSource() == fileOpenNewScene) {
+					openFile(false, true);
 				}
 				if (e.getSource() == fileSaveSS) {
 					saveSS();
@@ -408,6 +421,7 @@ public class MainFrame extends MainFrameDesign {
 			}
 		};
 		fileOpen.addActionListener(fileAction);
+		fileOpenNewScene.addActionListener(fileAction);
 		fileSaveSS.addActionListener(fileAction);
 		fileAbout.addActionListener(fileAction);
 		fileSettings.addActionListener(fileAction);
@@ -619,7 +633,8 @@ public class MainFrame extends MainFrameDesign {
 				}
 				String title = (String) table.getModel().getValueAt(row, 0);
 				ModelSelection selection = rendere.getCuttentSelection();
-				String key = selection.index + "-" + title + "-" + selection.resolution;
+				String key = sceneManager.indexOf(scene) + ":" + selection.index + "-" + title + "-"
+						+ selection.resolution;
 				ChartData data = scene.getChartData(title, selection);
 				ChartFrame frame;
 				if (chartFrames.containsKey(key)) {
@@ -659,18 +674,18 @@ public class MainFrame extends MainFrameDesign {
                 }
 
                 int row = mapTable.getSelectedRow();
-                    if (row < 0) {
-                        return;
-                }
-
-                String key = (String) mapTable.getModel().getValueAt(row, 0);
-                window.getActiveRenderer().changeSpectrum(key);
-                viewRescale.setEnabled(row > 0);
-                glPanel.repaint();
+				String key = null;
+            
+				if(row >= 0) {
+                    key = (String) mapTable.getModel().getValueAt(row, 0);
+                    window.getActiveRenderer().changeSpectrum(key);
+                    viewRescale.setEnabled(row > 0);
+                    glPanel.repaint();
+				}
 
 				if (spectrumInfoPanel.isVisible()) {
-                    loadDescription(key);
-                }
+					loadDescription(key);
+				}
             }
 		});
 
@@ -824,7 +839,7 @@ public class MainFrame extends MainFrameDesign {
 	 * open the file at startup
 	 */
 	public void openFirst() {
-		if (!openFile(true)) {
+		if (!openFile(true, false)) {
 //			System.exit(0);
 		}
 	}
@@ -833,9 +848,10 @@ public class MainFrame extends MainFrameDesign {
 	 * Open the file based on the setting property file.
 	 * 
 	 * @param isStartUp
+	 * @param newScene open the folder as a new scene
 	 * @return
 	 */
-	private boolean openFile(boolean isStartUp) {
+	private boolean openFile(boolean isStartUp, boolean newScene) {
 		// get path from property
 		String defaultDataPath = App.getProp(Const.DATA_PATH_KEY);
 		File checkedfile = null;
@@ -849,7 +865,7 @@ public class MainFrame extends MainFrameDesign {
 			if (App.isMacExe) {
 				workingDirectory = workingDirectory.getParentFile().getParentFile().getParentFile();
 			}
-			return openDialog(workingDirectory);
+			return openDialog(workingDirectory, newScene);
 		} else {
 			// Whether there is SETTING_TXT in the directory
 			File file = new File(defaultDataPath);
@@ -857,7 +873,7 @@ public class MainFrame extends MainFrameDesign {
 
 			if (files != null && Arrays.asList(files).contains(Const.SETTING_TXT)) {
 				if (isStartUp) {
-					loadFile(file);
+					loadFile(file, newScene);
 					return true;
 				} else {
 					String parentPath;
@@ -868,10 +884,10 @@ public class MainFrame extends MainFrameDesign {
 						parentPath = file.getParent();
 					}
 					File workingDirectory = new File(parentPath);
-					return openDialog(workingDirectory);
+					return openDialog(workingDirectory, newScene);
 				}
 			} else {
-				return openDialog(file);
+				return openDialog(file, newScene);
 			}
 		}
 	}
@@ -920,11 +936,11 @@ public class MainFrame extends MainFrameDesign {
 	 * @param dir
 	 * @return
 	 */
-	private boolean openDialog(File dir) {
+	private boolean openDialog(File dir, boolean newScene) {
 		JFileChooser chooser = App.showOpenDialog(this, dir.getAbsolutePath(), JFileChooser.DIRECTORIES_ONLY, null,
 				true);
 		if (chooser != null) {
-			loadFile(chooser.getSelectedFile());
+			loadFile(chooser.getSelectedFile(), newScene);
 			return true;
 		}
 		return false;
@@ -973,7 +989,9 @@ public class MainFrame extends MainFrameDesign {
 	 */
 	private void loadLookUpTable() {
 		try {
-			this.scene.loadLookUpTable();
+			for (Scene s : sceneManager.getScenes()) {
+				s.loadLookUpTable();
+			}
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -1007,28 +1025,47 @@ public class MainFrame extends MainFrameDesign {
 	}
 
 	/**
-	 * Load files.
-	 * 
-	 * @param file
-	 */
-	/**
 	 * Load the HTML explanation for the given spectrum/map key into the
-	 * description panel. The current data folder is searched first
-	 * ({@code Description/{lang}/{key}.html}), then the bundled JAR resource,
-	 * and finally a "no explanation" placeholder.
+	 * description panel. The current data folder is searched first, then the
+	 * bundled JAR resource, and finally a "no explanation" placeholder.
 	 */
 	private void loadDescription(String key) {
 		String lang = I18n.getLocale().getLanguage();
-		String html = null;
-		if (currentDataDir != null) {
-			File f = new File(currentDataDir,
-					"Description" + File.separator + lang + File.separator + key + ".html");
-			if (f.exists()) {
-				html = readFileAsString(f);
+		String targetKey = key;
+
+		if (targetKey == null || targetKey.isEmpty() || "#None".equals(targetKey)) {
+			String parent = getParentFileName();
+			if (parent != null && !parent.isEmpty()) {
+				String baseName = parent.replaceFirst("\\.[^.]+$", "");
+				String normalizedBaseName = baseName.toLowerCase(Locale.ROOT);
+				if (normalizedBaseName.startsWith("itokawa")) {
+					targetKey = "Itokawa";
+				} else if (normalizedBaseName.startsWith("ryugu")) {
+					targetKey = "Ryugu";
+				} else {
+					targetKey = parent.replace(".", "_");
+				}
 			}
 		}
-		if (html == null) {
-			URL url = App.class.getResource("/aigis/res/spectrum/" + lang + "/" + key + ".html");
+
+		String html = null;
+		if (currentDataDir != null) {
+			for (String candidate : new String[] { key, targetKey }) {
+				if (candidate == null || candidate.isEmpty()) {
+					continue;
+				}
+				File f = new File(currentDataDir,
+						"Description" + File.separator + lang + File.separator + candidate + ".html");
+				if (f.exists()) {
+					html = readFileAsString(f);
+					if (html != null) {
+						break;
+					}
+				}
+			}
+		}
+		if (html == null && targetKey != null && !targetKey.isEmpty()) {
+			URL url = App.class.getResource("/aigis/res/spectrum/" + lang + "/" + targetKey + ".html");
 			if (url != null) {
 				html = readUrlAsString(url);
 			}
@@ -1036,7 +1073,7 @@ public class MainFrame extends MainFrameDesign {
 		if (html == null) {
 			html = "<html><body>" + I18n.t("j.noexplanation") + "</body></html>";
 		}
-		spectrumDescriptionArea.setContentType("text/html");
+		spectrumDescriptionArea.setContentType("text/html; charset=UTF-8");
 		spectrumDescriptionArea.setText(html);
 		spectrumDescriptionArea.setCaretPosition(0);
 	}
@@ -1065,20 +1102,29 @@ public class MainFrame extends MainFrameDesign {
 		}
 	}
 
-	private void loadFile(File file) {
-		Logger.Debug(file.getAbsolutePath());
+	/**
+	 * Load files.
+	 *
+	 * @param file
+	 * @param newScene open the folder as a new scene
+	 */
+	private void loadFile(File file, boolean newScene) {
+		this.parentFileName = file.getName();
 		this.currentDataDir = file;
+		Logger.Debug(file.getAbsolutePath());
 		LoadingDialog dialog = new LoadingDialog(this);
 		setEnabled(false);
 
 		// show loading dialog
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
-				for (ChartFrame frame : chartFrames.values()) {
-					frame.setVisible(false);
+				if (!newScene) {
+					for (ChartFrame frame : chartFrames.values()) {
+						frame.setVisible(false);
+					}
+					chartFrames.clear();
+					window.textures.clearTextures();
 				}
-				chartFrames.clear();
-				window.textures.clearTextures();
 
 				dialog.setLocationRelativeTo(MainFrame.this);
 				dialog.setVisible(true);
@@ -1087,13 +1133,24 @@ public class MainFrame extends MainFrameDesign {
 					@Override
 					public void run() {
 						try {
-							setTitle("AiGIS");
-							clearModelList();
-							updateMapInfo(-1, null, null);
-							mapModel.clear();
 							JCheckBoxMenuItem mapSortByName = getChckbxmntmByName();
-							scene.load(file, dialog, mapSortByName.isSelected());
-							window.resetRenderer(true, scene.getModelSize());
+							if (newScene) {
+								// load into a new scene and show it in the active view
+								Scene loaded = sceneManager.loadNewScene(file, dialog, mapSortByName.isSelected());
+								setTitle("AiGIS");
+								clearModelList();
+								updateMapInfo(-1, null, null);
+								mapModel.clear();
+								scene = loaded;
+								window.setSceneToActiveView(loaded, loaded.getModelSize());
+							} else {
+								setTitle("AiGIS");
+								clearModelList();
+								updateMapInfo(-1, null, null);
+								mapModel.clear();
+								scene.load(file, dialog, mapSortByName.isSelected());
+								window.resetRenderer(true, scene.getModelSize());
+							}
 							getPanelGL().repaint();
 						} catch (Exception e) {
 							Logger.Error(e);
