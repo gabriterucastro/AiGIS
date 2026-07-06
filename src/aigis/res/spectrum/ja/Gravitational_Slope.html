@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: "Yu Gothic", "Meiryo", sans-serif; font-size: 12px; margin: 8px; color: #222; }
+  h1 { font-size: 14px; color: #1a4a8a; border-bottom: 2px solid #1a4a8a; padding-bottom: 4px; margin-bottom: 8px; }
+  h2 { font-size: 12px; color: #2a5a9a; border-left: 4px solid #2a5a9a; padding-left: 6px; margin: 8px 0 4px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 11px; margin: 5px 0; }
+  th { background: #2a5a9a; color: white; padding: 3px 6px; text-align: left; }
+  td { border: 1px solid #ccc; padding: 3px 6px; }
+  tr:nth-child(even) td { background: #f0f4ff; }
+  p { margin: 3px 0; line-height: 1.6; }
+  .box { background: #eef2ff; border-left: 3px solid #2a5a9a; padding: 4px 8px; margin: 5px 0; }
+  .keyword { font-weight: bold; color: #1a4a8a; }
+  .note { font-size: 10px; color: #666; font-style: italic; }
+  .color-bar { height: 16px; width: 100%; background: linear-gradient(to right, #00008b, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000); border-radius: 3px; margin: 4px 0; }
+</style>
+</head>
+<body>
+
+<h1>重力斜度（Gravitational Slope）</h1>
+<p>現在の自転速度（7.63時間）での計算値</p>
+
+<h2>かんたん説明</h2>
+<div class="box">
+<p>「<span class="keyword">重力斜度</span>」とは、小惑星の表面で<b>ものがどの方向に転がろうとするか</b>を示すデータです。</p>
+<p>地球の山と同じで、急な斜面ほど角度が大きくなります。ただし、小惑星では<b>自転（回転）による遠心力</b>も重力の一部として計算に含まれます。</p>
+<p>角度が大きい（赤い）場所 → 急斜面。砂や小石が留まりにくく、崩れやすい。<br>
+角度が小さい（青い）場所 → なだらか。砂や小石が集まりやすい。</p>
+</div>
+
+<h2>カラーマップの見方</h2>
+<div class="color-bar"></div>
+<table>
+  <tr><th>色</th><th>斜度の目安</th><th>地形の特徴</th></tr>
+  <tr><td>青〜緑</td><td>0〜20°</td><td>なだらかな平地・砂が集まりやすい</td></tr>
+  <tr><td>黄色</td><td>〜35°</td><td>砂が滑り始める限界（安息角）付近</td></tr>
+  <tr><td>赤</td><td>35°以上</td><td>急斜面・岩肌が露出しているか崩落跡</td></tr>
+</table>
+
+<h2>リュウグウで注目する場所</h2>
+<table>
+  <tr><th>場所</th><th>特徴</th></tr>
+  <tr><td>赤道リッジ（赤道の隆起帯）</td><td>急斜面が連続 → YORPスピンアップで物質が積み上がった証拠</td></tr>
+  <tr><td>南北の平坦部</td><td>斜度が低く物質が集まりやすい → ハヤブサ2の着地候補地</td></tr>
+  <tr><td>ウラシマクレーター周辺</td><td>衝突で地形が複雑化 → 斜度が不均一</td></tr>
+</table>
+
+<h2>このデータが教えてくれること</h2>
+<div class="box">
+<p>・<b>赤道リッジの急傾斜</b>は、リュウグウが過去に高速で自転していた証拠<br>
+・<b>斜度が低いくぼみ</b>には砂（レゴリス）が集まりやすく、着陸に適した地形<br>
+・急斜面の分布から、<b>どこに岩石が露出しているか</b>推測できる</p>
+</div>
+
+<p class="note">※ データはSFM形状モデル（Hayabusa2観測）に基づき計算。自転周期7.63時間（現在値）で重力と遠心力を合成した「実効重力」の傾斜角。</p>
+
+<h2>出典・参考文献</h2>
+<p class="note">
+Watanabe, S., et al. (2019). "Hayabusa2 arrives at the carbonaceous asteroid 162173 Ryugu—A spinning top–shaped rubble pile." <i>Science</i>, 364, 268–272. doi:10.1126/science.aav8032<br>
+Scheeres, D.J., et al. (2019). "The dynamic geophysical environment of (162173) Ryugu based on Hayabusa2 measurements." <i>Nature Astronomy</i>, 3, 533–543. doi:10.1038/s41550-019-0721-3<br>
+Sugita, S., et al. (2019). "The geomorphology, color, and thermal properties of Ryugu: Implications for parent-body processes." <i>Science</i>, 364, eaaw0422. doi:10.1126/science.aaw0422
+</p>
+
+</body>
+</html>

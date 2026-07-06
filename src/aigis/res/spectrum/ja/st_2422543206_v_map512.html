@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: "Yu Gothic", "Meiryo", sans-serif; font-size: 12px; margin: 8px; color: #222; }
+  h1 { font-size: 14px; color: #8a3a1a; border-bottom: 2px solid #8a3a1a; padding-bottom: 4px; margin-bottom: 8px; }
+  h2 { font-size: 12px; color: #9a5a2a; border-left: 4px solid #9a5a2a; padding-left: 6px; margin: 8px 0 4px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 11px; margin: 5px 0; }
+  th { background: #9a5a2a; color: white; padding: 3px 6px; text-align: left; }
+  td { border: 1px solid #ccc; padding: 3px 6px; }
+  tr:nth-child(even) td { background: #fff4ee; }
+  p { margin: 3px 0; line-height: 1.6; }
+  .box { background: #fff0e8; border-left: 3px solid #9a5a2a; padding: 4px 8px; margin: 5px 0; }
+  .keyword { font-weight: bold; color: #8a3a1a; }
+  .note { font-size: 10px; color: #666; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>テクスチャマップ（st_2422543206_v_map512）</h1>
+<p>AMICAカメラ画像から作成した全球テクスチャ — 実際の見た目の再現</p>
+
+<h2>かんたん説明</h2>
+<div class="box">
+<p>このMapDataは、<span class="keyword">はやぶさのAMICAカメラ</span>が撮影した多数の写真を組み合わせて、イトカワの表面を<b>実際の色・模様で覆った（テクスチャマッピングした）</b>データです。</p>
+<p>3Dゲームのキャラクターに「肌の画像」を貼り付けるのと同じ仕組みで、形状モデルの上に本物の写真データを貼り付けています。</p>
+<p>重力データや斜度データとは違い、<b>カメラに見えた見た目そのもの</b>を表示します。</p>
+</div>
+
+<h2>ファイル名の意味</h2>
+<table>
+  <tr><th>部分</th><th>意味</th></tr>
+  <tr><td>st_</td><td>テクスチャ（surface texture）の略</td></tr>
+  <tr><td>2422543206</td><td>観測時刻またはシーケンス番号</td></tr>
+  <tr><td>v</td><td>v帯（可視光、visual band）</td></tr>
+  <tr><td>map512</td><td>512×256ピクセルの全球マップ</td></tr>
+</table>
+
+<h2>このデータで見えること</h2>
+<table>
+  <tr><th>特徴</th><th>説明</th></tr>
+  <tr><td>ミューゼスの海</td><td>写真で見ると明らかに周囲より平坦でなめらか</td></tr>
+  <tr><td>ボルダー群</td><td>大小の岩塊が立体的に確認できる</td></tr>
+  <tr><td>頭部・胴体の境界</td><td>くびれ部分の地形が写真でもはっきりわかる</td></tr>
+  <tr><td>全体の色</td><td>やや黄褐色 — Sタイプ（ケイ酸塩岩石）の特徴</td></tr>
+</table>
+
+<div class="box">
+<p>・<b>他のMapData（斜度・ポテンシャル等）と切り替えて見比べる</b>ことで、地形データと実際の見た目の対応関係がわかる<br>
+・テクスチャマップは「科学データ」ではなく「見た目の再現」なので、明暗は照明条件にも依存する<br>
+・512ピクセルの解像度制限があるため、小さなボルダーの詳細は別の高解像度データを参照</p>
+</div>
+
+<p class="note">※ はやぶさ（Hayabusa）搭載AMICAカメラによる撮像画像を等積分投影（等面積投影）で全球マップに変換したもの。</p>
+
+</body>
+</html>

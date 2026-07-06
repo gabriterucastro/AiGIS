@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: "Yu Gothic", "Meiryo", sans-serif; font-size: 12px; margin: 8px; color: #222; }
+  h1 { font-size: 14px; color: #1a4a8a; border-bottom: 2px solid #1a4a8a; padding-bottom: 4px; margin-bottom: 8px; }
+  h2 { font-size: 12px; color: #2a5a9a; border-left: 4px solid #2a5a9a; padding-left: 6px; margin: 8px 0 4px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 11px; margin: 5px 0; }
+  th { background: #2a5a9a; color: white; padding: 3px 6px; text-align: left; }
+  td { border: 1px solid #ccc; padding: 3px 6px; }
+  tr:nth-child(even) td { background: #f0f4ff; }
+  p { margin: 3px 0; line-height: 1.6; }
+  .box { background: #eef2ff; border-left: 3px solid #2a5a9a; padding: 4px 8px; margin: 5px 0; }
+  .keyword { font-weight: bold; color: #1a4a8a; }
+  .note { font-size: 10px; color: #666; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>重力斜度（自転周期 7.63時間）</h1>
+<p>現在の実際の自転速度での重力斜度マップ</p>
+
+<div class="box">
+<p>リュウグウの<b>現在の自転速度</b>（7.63時間で1回転）を使って計算した重力斜度です。重力と自転の遠心力を合わせた「実効重力」がどの方向を向いているかを表します。</p>
+<p>「<a href="Gravitational_Slope.html">Gravitational_Slope</a>」と同一のデータです。比較したい場合は自転周期4.00時間・3.50時間のデータと見比べてください。</p>
+</div>
+
+<h2>自転速度と地形の関係</h2>
+<table>
+  <tr><th>自転周期</th><th>赤道での遠心力</th><th>赤道リッジの状態</th></tr>
+  <tr><td>7.63時間（現在）</td><td>弱い</td><td>現在の地形に対応</td></tr>
+  <tr><td>4.00時間（仮想）</td><td>強い</td><td>赤道付近の斜度がより低下</td></tr>
+  <tr><td>3.50時間（臨界）</td><td>非常に強い</td><td>赤道部が崩壊限界に近い</td></tr>
+</table>
+
+<p class="note">※ 複数の自転周期データを比較することで、リュウグウがどのように現在の「コマ型」に変形したかを研究できます。</p>
+
+<h2>出典・参考文献</h2>
+<p class="note">
+Watanabe, S., et al. (2019). "Hayabusa2 arrives at the carbonaceous asteroid 162173 Ryugu." <i>Science</i>, 364, 268–272. doi:10.1126/science.aav8032<br>
+Scheeres, D.J., et al. (2019). "The dynamic geophysical environment of (162173) Ryugu based on Hayabusa2 measurements." <i>Nature Astronomy</i>, 3, 533–543. doi:10.1038/s41550-019-0721-3
+</p>
+
+</body>
+</html>
