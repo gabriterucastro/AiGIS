@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Arial, sans-serif; font-size: 12px; margin: 8px; color: #222; }
+  h1 { font-size: 14px; color: #1a4a8a; border-bottom: 2px solid #1a4a8a; padding-bottom: 4px; margin-bottom: 8px; }
+  h2 { font-size: 12px; color: #2a5a9a; border-left: 4px solid #2a5a9a; padding-left: 6px; margin: 8px 0 4px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 11px; margin: 5px 0; }
+  th { background: #2a5a9a; color: white; padding: 3px 6px; text-align: left; }
+  td { border: 1px solid #ccc; padding: 3px 6px; }
+  tr:nth-child(even) td { background: #f0f4ff; }
+  p { margin: 3px 0; line-height: 1.6; }
+  .box { background: #eef2ff; border-left: 3px solid #2a5a9a; padding: 4px 8px; margin: 5px 0; }
+  .note { font-size: 10px; color: #666; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1>Gravitational Slope (simulated 4.00-hour rotation)</h1>
+<p>Hypothetical slope if Ryugu rotated twice as fast as today</p>
+
+<div class="box">
+<p>Slope computed assuming Ryugu rotates once every <b>4.00 hours</b> — faster than today's 7.63 hours. Stronger centrifugal force at the equator reduces the effective gravity there, lowering the slope angle at the equatorial ridge compared to the current 7.63-hour case.</p>
+<p>Comparing with the current slope shows how YORP spin-down (or spin-up in the past) changes the surface stress pattern and may explain the equatorial ridge formation.</p>
+</div>
+
+<h2>Why Simulate Past Rotations?</h2>
+<table>
+  <tr><th>Purpose</th><th>Detail</th></tr>
+  <tr><td>Spinning-top formation test</td><td>Faster spin → equatorial material migration → ridge builds up</td></tr>
+  <tr><td>YORP tracking</td><td>Solar radiation torque slowly changes spin; comparing slope maps traces the history</td></tr>
+  <tr><td>Stability analysis</td><td>At which speed did the equatorial ridge reach its current stable angle?</td></tr>
+</table>
+
+<p class="note">Compare with Gravitational_Slope (7.63 hr) and Gravitational_Slope_3.50 (near-critical spin).</p>
+
+<h2>References</h2>
+<p class="note">
+Watanabe, S., et al. (2019). "Hayabusa2 arrives at the carbonaceous asteroid 162173 Ryugu." <i>Science</i>, 364, 268–272. doi:10.1126/science.aav8032<br>
+Scheeres, D.J., et al. (2019). "The dynamic geophysical environment of (162173) Ryugu based on Hayabusa2 measurements." <i>Nature Astronomy</i>, 3, 533–543. doi:10.1038/s41550-019-0721-3<br>
+Hirabayashi, M., et al. (2019). "Shape change of asteroid (162173) Ryugu during the Hayabusa2 mission." <i>Nature Communications</i>, 10, 4403. doi:10.1038/s41467-019-12368-4
+</p>
+
+</body>
+</html>
